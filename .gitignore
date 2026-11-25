@@ -1,0 +1,17 @@
+*.iml
+.gradle
+local.properties
+/.idea
+.DS_Store
+
+# The Android release key and its passwords
+keystore.properties
+*.jks
+*.keystore
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# The root's and every module's build directories
+build/
+.kotlin/
