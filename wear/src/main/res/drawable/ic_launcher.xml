@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Three stacked stones on a dark disc. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#FF263238"
+        android:pathData="M24,0a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path
+        android:fillColor="#FFB0BEC5"
+        android:pathData="M12,34a12,5 0,1 0,24 0a12,5 0,1 0,-24 0z" />
+    <path
+        android:fillColor="#FFCFD8DC"
+        android:pathData="M15,25a9,4 0,1 0,18 0a9,4 0,1 0,-18 0z" />
+    <path
+        android:fillColor="#FFECEFF1"
+        android:pathData="M18,17.5a6,3 0,1 0,12 0a6,3 0,1 0,-12 0z" />
+</vector>
