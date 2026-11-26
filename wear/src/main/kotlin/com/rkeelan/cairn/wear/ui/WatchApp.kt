@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +40,7 @@ import androidx.wear.compose.material3.Text
 import com.rkeelan.cairn.link.Interactions
 import com.rkeelan.cairn.link.WatchItem
 import com.rkeelan.cairn.wear.R
+import com.rkeelan.cairn.wear.WatchRow
 import com.rkeelan.cairn.wear.WatchState
 import com.rkeelan.cairn.wear.WatchViewModel
 import com.rkeelan.cairn.wear.curveOffset
@@ -101,26 +102,23 @@ private fun CurvedList(state: WatchState.Ready, onTick: (key: String, bought: Bo
                 // Room for the first and last rows to scroll to the middle of the screen, where there is most room for them.
                 contentPadding = PaddingValues(top = maxHeight * 0.3f, bottom = maxHeight * 0.4f),
             ) {
-                items(state.needed, key = WatchItem::key) { item ->
-                    ItemRow(item, Modifier.curved(rows, item.key, radius), onTick)
-                }
-                if (state.bought.isNotEmpty()) {
-                    item(key = BOUGHT_HEADING) {
-                        Text(
+                // The rows have no keys, so the list keeps its place by position. A lazy list keeps the first row on screen in view wherever
+                // its key moves, so with items as keys, ticking that row would scroll the list down to the bought items with it.
+                itemsIndexed(state.rows, contentType = { _, row -> row::class }) { index, row ->
+                    when (row) {
+                        is WatchRow.Item -> ItemRow(row.item, Modifier.curved(rows, index, radius), onTick)
+
+                        WatchRow.BoughtHeading -> Text(
                             stringResource(R.string.bought),
                             modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
+
+                        // Composed only as the list is scrolled near its end, which is when the next page of bought items is wanted.
+                        WatchRow.MoreBought -> LaunchedEffect(state.bought.size) { onMoreBought() }
                     }
-                    items(state.bought, key = WatchItem::key) { item ->
-                        ItemRow(item, Modifier.curved(rows, item.key, radius), onTick)
-                    }
-                }
-                if (state.moreBought) {
-                    // Composed only as the list is scrolled near its end, which is when the next page of bought items is wanted.
-                    item(key = MORE) { LaunchedEffect(state.bought.size) { onMoreBought() } }
                 }
             }
         }
@@ -159,14 +157,11 @@ private fun ItemRow(item: WatchItem, modifier: Modifier, onTick: (key: String, b
     }
 }
 
-/** Moves the row with this [key] right as far as the screen's edge curves in at the height the row is drawn, which changes as the list scrolls. */
-private fun Modifier.curved(rows: LazyListState, key: String, radius: Float): Modifier = graphicsLayer {
+/** Moves the row at this [index] right as far as the screen's edge curves in at the height the row is drawn, which changes as the list scrolls. */
+private fun Modifier.curved(rows: LazyListState, index: Int, radius: Float): Modifier = graphicsLayer {
     val layout = rows.layoutInfo
-    val row = layout.visibleItemsInfo.firstOrNull { it.key == key } ?: return@graphicsLayer
+    val row = layout.visibleItemsInfo.firstOrNull { it.index == index } ?: return@graphicsLayer
     // A row's offset is measured from below the list's top padding, which viewportStartOffset gives as a negative number.
     val top = row.offset - layout.viewportStartOffset
     translationX = curveOffset(top + row.size / 2f - radius, radius)
 }
-
-private const val BOUGHT_HEADING = "heading:bought"
-private const val MORE = "more"
