@@ -4,7 +4,7 @@ local.properties
 /.idea
 .DS_Store
 
-# The Android release key and its passwords
+# The Android signing key and its passwords
 keystore.properties
 *.jks
 *.keystore

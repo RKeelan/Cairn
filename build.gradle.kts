@@ -1,11 +1,14 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasHostTestsBuilder
 import com.android.build.api.variant.HostTestBuilder
 import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import java.util.Properties
 
 plugins {
     // Gives the root project a check task, which runs ktlint over the build scripts in this directory.
@@ -24,6 +27,17 @@ plugins {
 
 // Robolectric reaches into JDK internals for file descriptors, which JDK 17 and later close to it by default.
 val robolectricJvmArgs = listOf("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
+
+// Cairn's key, from a git-ignored keystore.properties at the repository's root, or else from ~/.android/cairn-keystore.properties, which
+// every checkout and worktree on the PC shares (see README.md). Without either, builds are signed with the debug key, so that CI and
+// `./gradlew check` build without it.
+val keystoreProperties =
+    listOf(
+        rootProject.file("keystore.properties"),
+        File(System.getProperty("user.home"), ".android/cairn-keystore.properties"),
+    ).firstOrNull { it.isFile }?.let { file ->
+        Properties().apply { file.inputStream().use(::load) }
+    }
 
 // Every dependency is pinned to an exact version, so a range or a snapshot fails the build.
 allprojects {
@@ -85,6 +99,26 @@ subprojects {
                         minBound(75)
                     }
                 }
+            }
+        }
+    }
+
+    // Both apps sign every build, debug and release in both flavours, with Cairn's one key: the Data Layer links only apps signed with
+    // the same key, and Android installs a build over another only when they share a key, so switching builds never needs an uninstall.
+    pluginManager.withPlugin("com.android.application") {
+        val android = extensions.getByType<ApplicationExtension>()
+        val key =
+            keystoreProperties?.let { properties ->
+                android.signingConfigs.create("cairn") {
+                    storeFile = rootProject.file(properties.getProperty("storeFile"))
+                    storePassword = properties.getProperty("storePassword")
+                    keyAlias = properties.getProperty("keyAlias")
+                    keyPassword = properties.getProperty("keyPassword")
+                }
+            } ?: android.signingConfigs.getByName("debug")
+        extensions.configure<ApplicationAndroidComponentsExtension> {
+            onVariants { variant ->
+                variant.signingConfig.from(key)
             }
         }
     }
