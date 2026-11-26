@@ -16,3 +16,11 @@ updates:
       all-dependencies:
         patterns:
           - "*"
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"

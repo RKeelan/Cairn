@@ -1,0 +1,26 @@
+{
+  "$schema": "https://supabase.com/schemas/config/v1.json",
+  "project_id": "cairn",
+  // The local stack runs only what Cairn uses: the database, sign-in, the REST API and Realtime.
+  "studio": {
+    "enabled": false
+  },
+  "local_smtp": {
+    "enabled": false
+  },
+  "storage": {
+    "enabled": false
+  },
+  "edge_runtime": {
+    "enabled": false
+  },
+  "analytics": {
+    "enabled": false
+  },
+  "auth": {
+    "email": {
+      // The dev flavour's accounts sign up with an email address and a password, and nothing reads the confirmation email.
+      "enable_confirmations": false
+    }
+  }
+}

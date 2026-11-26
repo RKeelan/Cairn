@@ -15,3 +15,8 @@ keystore.properties
 # The root's and every module's build directories
 build/
 .kotlin/
+
+# The Supabase CLI, which bun installs, and what it keeps beside the project
+node_modules/
+supabase/.temp/
+supabase/.branches/
