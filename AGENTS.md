@@ -8,6 +8,16 @@ Run `./gradlew check` before handing work off. It runs ktlint, the unit tests, t
 
 Unit tests must cover at least 75% of the code Kover measures. Composables and activities are left out of the measurement, so keep logic in plain Kotlin where tests reach it.
 
+## Supabase
+
+`supabase/migrations` defines the tables and the functions the apps call, and `docs/data-model.md` describes them. Change the description with the tables.
+
+Run the CLI as `bunx supabase`, which uses the version `package.json` pins. `bunx supabase db reset` loses what the local stack holds, the accounts included. CI starts a local stack from the migrations and the seed data, and lints the database with `bunx supabase db lint`.
+
+Never link to, push to, or otherwise change a hosted Supabase project without the maintainer's agreement.
+
+## Emulators and devices
+
 Always start an emulator with `-no-audio`, headless or not: without it the emulator opens an audio stream to the host, which makes the PC's speakers pop. Set `ANDROID_SERIAL` before any adb command, and never install on a physical device without the maintainer's agreement. Never publish to Google Play, or run anything else that talks to it, without the maintainer's agreement.
 
 ## Public repository
@@ -24,4 +34,4 @@ Treat everything in this repository as public: files, commit messages, branch an
 
 ## Dependency Policy
 
-All dependencies and Gradle plugins are pinned to exact versions in `gradle/libs.versions.toml`, and the build fails on a dynamic or changing version. GitHub Actions are pinned to commit SHAs. Do not use version ranges. Dependabot handles upgrades.
+All dependencies and Gradle plugins are pinned to exact versions in `gradle/libs.versions.toml`, and the build fails on a dynamic or changing version. The Supabase CLI is pinned in `package.json`, and GitHub Actions are pinned to commit SHAs. Do not use version ranges. Dependabot handles upgrades.
