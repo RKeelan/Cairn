@@ -1,7 +1,20 @@
 package com.rkeelan.cairn.core
 
 /** The order the needed items are shown in. */
-enum class Order { OLDEST_FIRST, NEWEST_FIRST, ALPHABETICAL }
+enum class Order {
+    OLDEST_FIRST,
+    NEWEST_FIRST,
+    ALPHABETICAL,
+    ;
+
+    /** Puts items in this order. */
+    val comparator: Comparator<Item>
+        get() = when (this) {
+            OLDEST_FIRST -> compareBy(Item::addedAt).thenBy(Item::key)
+            NEWEST_FIRST -> compareByDescending(Item::addedAt).thenBy(Item::key)
+            ALPHABETICAL -> compareBy(Item::key)
+        }
+}
 
 /** How the list is shown. The phone keeps the settings, and the watch follows the phone's. */
 data class Settings(val order: Order = Order.OLDEST_FIRST)
@@ -20,11 +33,5 @@ data class Arrangement(val needed: List<Item>, val bought: List<Item>, val moreB
 }
 
 /** The list as [settings] lay it out, with up to [boughtShown] bought items. */
-fun ShoppingList.arranged(settings: Settings, boughtShown: Int = Arrangement.BOUGHT_PAGE): Arrangement {
-    val order = when (settings.order) {
-        Order.OLDEST_FIRST -> compareBy(Item::addedAt).thenBy(Item::key)
-        Order.NEWEST_FIRST -> compareByDescending(Item::addedAt).thenBy(Item::key)
-        Order.ALPHABETICAL -> compareBy(Item::key)
-    }
-    return Arrangement(needed.sortedWith(order), bought.take(boughtShown), bought.size > boughtShown)
-}
+fun ShoppingList.arranged(settings: Settings, boughtShown: Int = Arrangement.BOUGHT_PAGE): Arrangement =
+    Arrangement(needed.sortedWith(settings.order.comparator), bought.take(boughtShown), bought.size > boughtShown)

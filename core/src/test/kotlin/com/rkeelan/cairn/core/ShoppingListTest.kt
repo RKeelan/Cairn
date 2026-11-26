@@ -99,6 +99,20 @@ class ShoppingListTest {
     }
 
     @Test
+    fun aTickFromElsewhereCountsOnlyIfItIsLater() {
+        val list = shopping("Milk", "Eggs").tick("eggs", now = 200).remove("milk", now = 201)
+        val eggs = list["eggs"]!!
+
+        assertEquals(Status.NEEDED, list.ticked("eggs", bought = false, at = 300)["eggs"]?.status)
+        assertEquals(setOf("eggs", "milk"), list.ticked("eggs", bought = false, at = 300).unsent)
+        assertEquals(300L, list.ticked("eggs", bought = false, at = 300)["eggs"]?.changedAt)
+        assertSame(list, list.ticked("eggs", bought = false, at = eggs.changedAt))
+        assertSame(list, list.ticked("eggs", bought = true, at = 300))
+        assertSame(list, list.ticked("milk", bought = true, at = 300))
+        assertSame(list, list.ticked("no such item", bought = true, at = 300))
+    }
+
+    @Test
     fun removingTakesANeededOrBoughtItemOffTheList() {
         val list = shopping("Milk", "Eggs").tick("milk", now = 200).remove("milk", now = 300).remove("eggs", now = 300)
 

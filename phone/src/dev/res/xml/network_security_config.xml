@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The dev flavour may speak plain HTTP to the device's own loopback address alone, where `adb reverse tcp:54321 tcp:54321` puts the
+    local Supabase stack (see README.md). Everything else, and the prod flavour, which has no network security config, is HTTPS only.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
