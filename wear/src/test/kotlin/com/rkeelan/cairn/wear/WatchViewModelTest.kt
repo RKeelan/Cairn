@@ -124,4 +124,16 @@ class WatchViewModelTest {
         assertEquals(count, watch.ready.bought.size)
         assertFalse(watch.ready.moreBought)
     }
+
+    @Test
+    fun theRowsAreTheNeededItemsThenAHeadingAndTheBoughtOnes() {
+        val milk = item("Milk", 0)
+        val bread = item("Bread", 1, bought = true)
+
+        assertEquals(listOf(WatchRow.Item(milk)), WatchState.Ready(listOf(milk), emptyList(), moreBought = false).rows)
+        assertEquals(
+            listOf(WatchRow.Item(milk), WatchRow.BoughtHeading, WatchRow.Item(bread), WatchRow.MoreBought),
+            WatchState.Ready(listOf(milk), listOf(bread), moreBought = true).rows,
+        )
+    }
 }

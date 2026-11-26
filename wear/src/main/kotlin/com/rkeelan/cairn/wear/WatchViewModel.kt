@@ -29,7 +29,29 @@ sealed interface WatchState {
     /** The [needed] items, then up to as many [bought] ones as have been asked for, and whether there are [moreBought]. */
     data class Ready(val needed: List<WatchItem>, val bought: List<WatchItem>, val moreBought: Boolean) : WatchState {
         val isEmpty: Boolean get() = needed.isEmpty() && bought.isEmpty()
+
+        /** The rows of the list, top to bottom: the needed items, then a heading and the bought items, then a place that asks for more of them. */
+        val rows: List<WatchRow> by lazy {
+            buildList {
+                needed.mapTo(this, WatchRow::Item)
+                if (bought.isNotEmpty()) {
+                    add(WatchRow.BoughtHeading)
+                    bought.mapTo(this, WatchRow::Item)
+                }
+                if (moreBought) add(WatchRow.MoreBought)
+            }
+        }
     }
+}
+
+/** A row of the watch's list. */
+sealed interface WatchRow {
+    data class Item(val item: WatchItem) : WatchRow
+
+    data object BoughtHeading : WatchRow
+
+    /** Asks for the next page of bought items when it is shown, near the end of the list. */
+    data object MoreBought : WatchRow
 }
 
 /**
