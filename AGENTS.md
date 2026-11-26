@@ -6,11 +6,13 @@ Cairn is a shopping list for Android phones and Wear OS watches. `README.md` des
 
 Run `./gradlew check` before handing work off. It runs ktlint, the unit tests, the coverage check and Android Lint, as CI does. `./gradlew ktlintFormat` fixes formatting.
 
-Unit tests must cover at least 75% of the code Kover measures. Composables and activities are left out of the measurement, so keep logic in plain Kotlin where tests reach it.
+CI also runs `./gradlew :core:integrationTest` against a local Supabase stack. Run it after changing anything in `supabase/` or in `SupabaseServer`.
+
+Unit tests must cover at least 75% of the code Kover measures. Composables and activities are left out of the measurement, and so is the Supabase client, which the integration tests cover. Keep logic in `:core`, where tests reach it.
 
 ## Supabase
 
-`supabase/migrations` defines the tables and the functions the apps call, and `docs/data-model.md` describes them. Change the description with the tables.
+`supabase/migrations` defines the tables and the functions the apps call, and `docs/data-model.md` describes them. Change the description with the tables. A change to a function's arguments or to what it returns changes `SupabaseServer` with it, and the fake server in `core/src/testFixtures`, which follows the same rules.
 
 Run the CLI as `bunx supabase`, which uses the version `package.json` pins. `bunx supabase db reset` loses what the local stack holds, the accounts included. CI starts a local stack from the migrations and the seed data, and lints the database with `bunx supabase db lint`.
 

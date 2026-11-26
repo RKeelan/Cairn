@@ -8,8 +8,14 @@ A household shares one list, which a [Supabase](https://supabase.com) project ho
 
 The apps never write to a table. They call four functions, which `supabase/migrations` defines along with the tables: `my_lists`, `sync`, `add_member` and `remove_member`. `docs/data-model.md` describes the tables and their fields.
 
+* An item is identified by its name, without regard to case or spacing, so "Milk" added on two devices is one item.
+* Each device keeps a copy of the list, changes it at once, and exchanges changes with the project when it can reach it. Where two changes to an item meet, the one made later wins.
+* Ticking an item marks it bought. Bought items stay on show after the needed ones, the most recently ticked first, so that a mistaken tick is easy to undo, and they are suggested when a name is typed.
+* An item may have a quantity, a unit, both or neither, as in "2 loaves", "500 g", "3" and "a box". Common units, such as grams and cups, are written in one standard form.
+
 ## Layout
 
+* `:core` is pure Kotlin on the JVM and never depends on Android. It holds the list and its operations, the exchange of changes with the server, and the Supabase client.
 * `:wear` is the Wear OS app, written in Kotlin with Compose for Wear OS.
 * `supabase/` is the Supabase project: its configuration, its migrations, and the seed data of the local stack.
 
@@ -19,8 +25,9 @@ The build needs JDK 17 or later and the Android SDK, found through `ANDROID_HOME
 
 - `./gradlew check` lints with ktlint and Android Lint, runs the unit tests, and fails if they cover less than 75% of the measured code
 - `./gradlew ktlintFormat` fixes formatting
-- `./gradlew :wear:testDebugUnitTest` runs the unit tests
-- `./gradlew :wear:koverHtmlReportDebug` writes a coverage report to `wear/build/reports/kover/htmlDebug`
+- `./gradlew :core:test` and `./gradlew :wear:testDebugUnitTest` run each module's unit tests
+- `./gradlew :core:integrationTest` runs the Supabase client against the local stack, which must be running
+- `./gradlew :core:koverHtmlReport` and `./gradlew :wear:koverHtmlReportDebug` write coverage reports under each module's `build/reports/kover`
 - `./gradlew :wear:installDebug` installs the watch app on the connected device or emulator
 
 ## The local Supabase stack
