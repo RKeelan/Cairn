@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cairn</string>
+
+    <string name="open_on_phone">Open Cairn on your phone</string>
+    <string name="nothing_to_buy">Nothing to buy</string>
+    <string name="bought">Bought</string>
+    <string name="tick">Tick off</string>
+    <string name="untick">Put back on the list</string>
 </resources>
