@@ -26,6 +26,8 @@ Always start an emulator with `-no-audio`, headless or not: without it the emula
 
 The dev flavour of the phone app reaches the local Supabase stack through `adb reverse tcp:54321 tcp:54321`. It logs failed syncs, and failures to reach the watch, under the tag `Cairn`: `adb logcat -s Cairn`.
 
+The watch app shows only what the phone app sends it, so testing it needs a phone and a watch that are paired. With emulators, that takes a phone emulator with the Play Store, signed in to a Google account and with Google's Wear OS app installed, and Android Studio's Device Manager to pair it with a watch emulator (Pair Wearable on the watch). An emulator made with `avdmanager` from a Play Store image says it has no Play Store until `PlayStore.enabled=yes` is set in its `config.ini`, and Android Studio will not pair it until then. Turn audio off in an emulator's `config.ini` (`hw.audioInput = no` and `hw.audioOutput = no`), since Android Studio starts emulators without `-no-audio`. A watch emulator left on dims into ambient mode, where a tap only wakes it: `adb shell svc power stayon true` keeps it awake.
+
 ## Public repository
 
 Treat everything in this repository as public: files, commit messages, branch and tag names, and the text of issues, pull requests, reviews and releases. Write all of it for any developer, never to or about a particular person, and keep the developer's private information out of it:

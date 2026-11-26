@@ -9,10 +9,10 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
 
-        <!-- The watch app works without a phone app. -->
+        <!-- The watch app gets the list from the phone app, and does nothing without it. -->
         <meta-data
             android:name="com.google.android.wearable.standalone"
-            android:value="true" />
+            android:value="false" />
 
         <activity
             android:name=".MainActivity"
