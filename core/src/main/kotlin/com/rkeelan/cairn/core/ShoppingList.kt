@@ -53,6 +53,16 @@ class ShoppingList private constructor(
     /** Makes the bought item with this [key] needed again, in the place it had. */
     fun untick(key: String, now: Long): ShoppingList = move(key, now, from = Status.BOUGHT, to = Status.NEEDED)
 
+    /**
+     * Takes a tick made elsewhere that reached this device directly, as a watch's ticks reach the phone: the item with this [key] marked [bought],
+     * or needed again, [at] that time. A tick no later than the item's last change gives way to it, as a change from the server would.
+     */
+    fun ticked(key: String, bought: Boolean, at: Long): ShoppingList {
+        val item = byKey[key]?.takeIf { it.status != Status.REMOVED && at > it.changedAt } ?: return this
+        val status = if (bought) Status.BOUGHT else Status.NEEDED
+        return if (status == item.status) this else changed(item.copy(status = status, changedAt = at))
+    }
+
     /** Takes the item with this [key] off the list, needed or bought, so that the list neither shows nor suggests it. */
     fun remove(key: String, now: Long): ShoppingList {
         val item = byKey[key]?.takeIf { it.status != Status.REMOVED } ?: return this

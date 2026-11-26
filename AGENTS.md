@@ -8,7 +8,9 @@ Run `./gradlew check` before handing work off. It runs ktlint, the unit tests, t
 
 CI also runs `./gradlew :core:integrationTest` against a local Supabase stack. Run it after changing anything in `supabase/` or in `SupabaseServer`.
 
-Unit tests must cover at least 75% of the code Kover measures. Composables and activities are left out of the measurement, and so is the Supabase client, which the integration tests cover. Keep logic in `:core`, where tests reach it.
+Unit tests must cover at least 75% of the code Kover measures in each module. Left out of the measurement are the screens, which live in each app's `ui` package; the classes that only connect an app to Android or to the Data Layer, such as activities, services and `Link`; and the Supabase client, which the integration tests cover. The root `build.gradle.kts` lists them. Keep logic out of all of them, in `:core` where it can be, so that tests reach it.
+
+The list the phone sends the watch, and the ticks the watch sends back, are in `link/src/main/kotlin/.../WatchList.kt`. A watch app and a phone app of different versions may meet, so add fields with defaults, and never rename or remove one.
 
 ## Supabase
 
@@ -21,6 +23,8 @@ Never link to, push to, or otherwise change a hosted Supabase project without th
 ## Emulators and devices
 
 Always start an emulator with `-no-audio`, headless or not: without it the emulator opens an audio stream to the host, which makes the PC's speakers pop. Set `ANDROID_SERIAL` before any adb command, and never install on a physical device without the maintainer's agreement. Never publish to Google Play, or run anything else that talks to it, without the maintainer's agreement.
+
+The dev flavour of the phone app reaches the local Supabase stack through `adb reverse tcp:54321 tcp:54321`. It logs failed syncs, and failures to reach the watch, under the tag `Cairn`: `adb logcat -s Cairn`.
 
 ## Public repository
 
