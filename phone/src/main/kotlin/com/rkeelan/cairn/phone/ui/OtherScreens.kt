@@ -48,10 +48,14 @@ import com.rkeelan.cairn.phone.UiState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(title: String, onBack: () -> Unit) {
+    val interactions = LocalInteractions.current
     TopAppBar(
         title = { Text(title) },
         navigationIcon = {
-            IconButton(onClick = onBack) { Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.back)) }
+            IconButton(onClick = {
+                interactions.start("back")
+                onBack()
+            }) { Icon(painterResource(R.drawable.ic_arrow_back), contentDescription = stringResource(R.string.back)) }
         },
     )
 }

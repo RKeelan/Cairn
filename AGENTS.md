@@ -12,6 +12,12 @@ Unit tests must cover at least 75% of the code Kover measures in each module. Le
 
 The list the phone sends the watch, and the ticks the watch sends back, are in `link/src/main/kotlin/.../WatchList.kt`. A watch app and a phone app of different versions may meet, so add fields with defaults, and never rename or remove one.
 
+## Speed
+
+Every tap shows its result within 100 ms of the finger lifting, the long-standing limit for a response to feel instantaneous ([Nielsen](https://www.nngroup.com/articles/response-times-3-important-limits/)), at the 90th percentile. Scrolling keeps up with the display's frame rate, drawing each frame in time for its refresh. Both hold on a Pixel 10 Pro XL and a Pixel Watch 4, in a release build. README.md, under "Measure speed", says how to measure them. Measure a change that could slow either.
+
+A tap's time runs from the finger lifting to the commit of the frame that first draws its result, when Android hands the frame to the display, which shows it at its next refresh. A click handler that changes what is shown calls `interactions.start` with the tap's name, so that the app times it. The time ends at the next frame, so a tap changes the state the screen reads at once, on the main thread, as the view models do, and leaves slower work, such as writing to Room or sending to the phone, to follow.
+
 ## Supabase
 
 `supabase/migrations` defines the tables and the functions the apps call, and `docs/data-model.md` describes them. Change the description with the tables. A change to a function's arguments or to what it returns changes `SupabaseServer` with it, and the fake server in `core/src/testFixtures`, which follows the same rules.
@@ -24,7 +30,7 @@ Never link to, push to, or otherwise change a hosted Supabase project without th
 
 Always start an emulator with `-no-audio`, headless or not: without it the emulator opens an audio stream to the host, which makes the PC's speakers pop. Set `ANDROID_SERIAL` before any adb command, and never install on a physical device without the maintainer's agreement. Never publish to Google Play, or run anything else that talks to it, without the maintainer's agreement.
 
-The dev flavour of the phone app reaches the local Supabase stack through `adb reverse tcp:54321 tcp:54321`. It logs failed syncs, and failures to reach the watch, under the tag `Cairn`: `adb logcat -s Cairn`.
+The dev flavour of the phone app reaches the local Supabase stack through `adb reverse tcp:54321 tcp:54321`. It logs failed syncs, and failures to reach the watch, under the tag `Cairn`: `adb logcat -s Cairn`. Both apps log the times of taps there too.
 
 The watch app shows only what the phone app sends it, so testing it needs a phone and a watch that are paired. With emulators, that takes a phone emulator with the Play Store, signed in to a Google account and with Google's Wear OS app installed, and Android Studio's Device Manager to pair it with a watch emulator (Pair Wearable on the watch). An emulator made with `avdmanager` from a Play Store image says it has no Play Store until `PlayStore.enabled=yes` is set in its `config.ini`, and Android Studio will not pair it until then. Turn audio off in an emulator's `config.ini` (`hw.audioInput = no` and `hw.audioOutput = no`), since Android Studio starts emulators without `-no-audio`. A watch emulator left on dims into ambient mode, where a tap only wakes it: `adb shell svc power stayon true` keeps it awake.
 
