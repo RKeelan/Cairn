@@ -1,5 +1,6 @@
 // The link between the phone app and the watch app: the list as the watch shows it, the ticks the watch sends back, and the Wearable Data Layer
-// that carries both. Both apps depend on it; the watch app depends on nothing else of Cairn's.
+// that carries both. It also holds the timer that times taps in both apps. Both apps depend on it; the watch app depends on nothing else of
+// Cairn's.
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)

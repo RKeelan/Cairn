@@ -98,6 +98,7 @@ fun ListScreen(
 ) {
     val scope = rememberCoroutineScope()
     val resources = LocalResources.current
+    val interactions = LocalInteractions.current
     val rows = rememberLazyListState()
     var editing by remember { mutableStateOf<Item?>(null) }
     var added by remember { mutableStateOf<String?>(null) }
@@ -148,7 +149,10 @@ fun ListScreen(
             ItemRow(
                 item = item,
                 modifier = modifier,
-                onTick = { onTick(item.key, it) },
+                onTick = {
+                    interactions.start("tick")
+                    onTick(item.key, it)
+                },
                 onRemove = {
                     onRemove(item.key)
                     offerUndo(resources.getString(R.string.removed, item.name), listOf(item))
@@ -289,6 +293,7 @@ private fun BoughtHeading(modifier: Modifier = Modifier) {
 private fun AddBar(list: ShoppingList, onAdd: (String) -> Unit) {
     var typed by rememberSaveable { mutableStateOf("") }
     val suggestions = remember(list, typed) { list.suggestions(typed) }
+    val interactions = LocalInteractions.current
     val add = { name: String ->
         if (name.isNotBlank()) {
             onAdd(name)
@@ -299,7 +304,12 @@ private fun AddBar(list: ShoppingList, onAdd: (String) -> Unit) {
         Column(Modifier.navigationBarsPadding().imePadding()) {
             if (suggestions.isNotEmpty()) {
                 LazyRow(contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(suggestions, key = { it }) { name -> SuggestionChip(onClick = { add(name) }, label = { Text(name) }) }
+                    items(suggestions, key = { it }) { name ->
+                        SuggestionChip(onClick = {
+                            interactions.start("add")
+                            add(name)
+                        }, label = { Text(name) })
+                    }
                 }
             }
             Row(
@@ -316,7 +326,10 @@ private fun AddBar(list: ShoppingList, onAdd: (String) -> Unit) {
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { add(typed) }),
                 )
-                FilledIconButton(onClick = { add(typed) }, enabled = typed.isNotBlank()) {
+                FilledIconButton(onClick = {
+                    interactions.start("add")
+                    add(typed)
+                }, enabled = typed.isNotBlank()) {
                     Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.add))
                 }
             }

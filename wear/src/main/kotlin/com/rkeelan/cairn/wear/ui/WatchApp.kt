@@ -37,15 +37,16 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.rkeelan.cairn.link.Interactions
 import com.rkeelan.cairn.link.WatchItem
 import com.rkeelan.cairn.wear.R
 import com.rkeelan.cairn.wear.WatchState
 import com.rkeelan.cairn.wear.WatchViewModel
 import com.rkeelan.cairn.wear.curveOffset
 
-/** The watch app: the list, or a message when there is none to show. */
+/** The watch app: the list, or a message when there is none to show. [interactions] times the taps. */
 @Composable
-fun WatchApp(model: WatchViewModel) {
+fun WatchApp(model: WatchViewModel, interactions: Interactions) {
     val state by model.state.collectAsStateWithLifecycle()
     MaterialTheme {
         AppScaffold {
@@ -58,7 +59,14 @@ fun WatchApp(model: WatchViewModel) {
                     if (current.isEmpty) {
                         Message(stringResource(R.string.nothing_to_buy))
                     } else {
-                        CurvedList(current, onTick = model::setBought, onMoreBought = model::showMoreBought)
+                        CurvedList(
+                            current,
+                            onTick = { key, bought ->
+                                interactions.start("tick")
+                                model.setBought(key, bought)
+                            },
+                            onMoreBought = model::showMoreBought,
+                        )
                     }
             }
         }
