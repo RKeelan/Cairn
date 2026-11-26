@@ -39,6 +39,35 @@ The build needs JDK 17 or later and the Android SDK, found through `ANDROID_HOME
 - `./gradlew :core:integrationTest` runs the Supabase client against the local stack, which must be running
 - `./gradlew :core:koverHtmlReport` and, for an Android module, `./gradlew :phone:koverHtmlReportDevDebug` write coverage reports under each module's `build/reports/kover`
 - `./gradlew :phone:installDevDebug` and `./gradlew :wear:installDevDebug` install the dev flavour on the device `ANDROID_SERIAL` names
+- `./gradlew :phone:installDevRelease` and `./gradlew :wear:installDevRelease` install the dev flavour's release builds
+
+## Signing
+
+Every build of both apps, debug and release in both flavours, is signed with Cairn's one key. The Data Layer links the phone app and the watch app only when the same key signs both, and Android installs a build over another only when they share a key, so a device moves between debug and release builds without an uninstall. The key lives in a keystore. Gradle reads the keystore's location and passwords from the first of these that exists:
+
+* `keystore.properties` at the repository's root, which Git ignores. It serves that one checkout.
+* `~/.android/cairn-keystore.properties`, which every checkout and worktree on the PC shares, so a worktree signs with Cairn's key without anything copied into it.
+
+Without either, builds are signed with the SDK's debug key, which is how CI builds them.
+
+The keystore and its properties file are kept in `~/.android`, outside any checkout. To create the keystore once, with the JDK's `keytool`:
+
+```powershell
+& "$env:JAVA_HOME\bin\keytool.exe" -genkeypair -v -keystore $HOME\.android\cairn.jks -alias cairn -keyalg RSA -keysize 4096 -validity 36500 -dname "CN=<name>"
+```
+
+Then write `~/.android/cairn-keystore.properties`. A PKCS12 keystore, keytool's default, uses its password for the key too. `storeFile` is absolute, with forward slashes, since a backslash is an escape in a properties file:
+
+```properties
+storeFile=C:/Users/<user>/.android/cairn.jks
+storePassword=<the keystore's password>
+keyAlias=cairn
+keyPassword=<the keystore's password>
+```
+
+A relative `storeFile` is relative to the repository's root. On another PC, copy the keystore into `~/.android` and write the properties file again.
+
+Android refuses to install a build over one signed with a different key, so a device holding builds signed with the debug key, from before the PC had Cairn's key, needs them uninstalled once: `adb uninstall com.rkeelan.cairn.dev` (or `com.rkeelan.cairn`) on the phone and the watch. Uninstalling deletes the phone app's copy of the list and its sign-in; the list itself is kept in Supabase.
 
 ## Measure speed
 
