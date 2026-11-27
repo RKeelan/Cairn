@@ -127,7 +127,6 @@ fun SignInScreen(signingIn: Boolean, options: SignInOptions, snackbars: Snackbar
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall)
-            Text(stringResource(R.string.tagline), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (signingIn) {
                 CircularProgressIndicator(Modifier.padding(top = 24.dp))
                 return@Column

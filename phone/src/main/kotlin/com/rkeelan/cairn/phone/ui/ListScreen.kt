@@ -367,7 +367,6 @@ private fun EditDialog(item: Item, onSave: (name: String, amount: String) -> Uni
                     value = quantity,
                     onValueChange = { quantity = it.take(MAX_AMOUNT_LENGTH) },
                     label = { Text(stringResource(R.string.amount)) },
-                    placeholder = { Text(stringResource(R.string.amount_example)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { if (name.isNotBlank()) onSave(name, quantity) }),

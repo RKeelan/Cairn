@@ -76,7 +76,7 @@ fun MembersScreen(state: UiState.Ready, snackbars: SnackbarHostState, onAdd: (St
                     supportingContent = if (own) ({ Text(stringResource(R.string.you)) }) else null,
                     trailingContent = {
                         IconButton(onClick = { removing = email }) {
-                            Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(if (own) R.string.leave else R.string.stop_sharing))
+                            Icon(painterResource(R.drawable.ic_close), contentDescription = stringResource(if (own) R.string.leave else R.string.remove))
                         }
                     },
                 ) { Text(email) }
@@ -93,10 +93,10 @@ fun MembersScreen(state: UiState.Ready, snackbars: SnackbarHostState, onAdd: (St
                         removing = null
                         onRemove(email)
                     },
-                ) { Text(stringResource(if (own) R.string.leave else R.string.stop_sharing)) }
+                ) { Text(stringResource(if (own) R.string.leave else R.string.remove)) }
             },
             dismissButton = { TextButton(onClick = { removing = null }) { Text(stringResource(R.string.cancel)) } },
-            text = { Text(if (own) stringResource(R.string.leave_question) else stringResource(R.string.stop_sharing_question, email)) },
+            text = { Text(if (own) stringResource(R.string.leave_question) else stringResource(R.string.remove_question, email)) },
         )
     }
 }

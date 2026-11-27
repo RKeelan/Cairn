@@ -3,9 +3,9 @@
     <string name="app_name">Cairn</string>
 
     <string name="list_title">Shopping list</string>
-    <string name="nothing_to_buy">Nothing to buy</string>
+    <string name="nothing_to_buy">Empty</string>
     <string name="bought">Bought</string>
-    <string name="add_item">Add an item</string>
+    <string name="add_item">Add item</string>
     <string name="add">Add</string>
     <string name="remove">Remove</string>
     <string name="edit">Edit</string>
@@ -18,22 +18,20 @@
     <string name="edit_item">Edit item</string>
     <string name="name">Name</string>
     <string name="amount">Amount</string>
-    <string name="amount_example">2 loaves, 500 g, a box</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
 
     <string name="offline">Offline</string>
     <plurals name="offline_with_changes">
-        <item quantity="one">Offline. %d change will be sent when you\'re connected.</item>
-        <item quantity="other">Offline. %d changes will be sent when you\'re connected.</item>
+        <item quantity="one">Offline: %d change waiting to sync</item>
+        <item quantity="other">Offline: %d changes waiting to sync</item>
     </plurals>
-    <string name="sync_failed">Can\'t sync right now</string>
+    <string name="sync_failed">Sync failed</string>
 
-    <string name="members">Shared with</string>
+    <string name="members">Sharing</string>
     <string name="you">You</string>
-    <string name="add_member">Add someone by email</string>
-    <string name="stop_sharing">Stop sharing</string>
-    <string name="stop_sharing_question">Stop sharing the list with %s?</string>
+    <string name="add_member">Email address</string>
+    <string name="remove_question">Remove %s from the list?</string>
     <string name="leave">Leave</string>
     <string name="leave_question">Leave this list? You will no longer see it.</string>
     <string name="back">Back</string>
@@ -46,15 +44,14 @@
     <string name="account">Account</string>
     <string name="sign_out">Sign out</string>
 
-    <string name="tagline">A shopping list for the household</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_as">Sign in as %s</string>
-    <string name="no_sign_in">This build has no way to sign in.</string>
-    <string name="not_invited">%s hasn\'t been invited to a list. Ask someone to share theirs with this address.</string>
+    <string name="no_sign_in">No sign-in is configured for this build.</string>
+    <string name="not_invited">No list has been shared with %s. Ask someone in your household to share theirs.</string>
     <string name="try_again">Try again</string>
 
-    <string name="notice_sign_in_failed">Couldn\'t sign in</string>
+    <string name="notice_sign_in_failed">Sign-in failed</string>
     <string name="notice_no_connection">No connection</string>
-    <string name="notice_not_an_email">That isn\'t an email address</string>
-    <string name="notice_failed">That didn\'t work</string>
+    <string name="notice_not_an_email">Not a valid email address</string>
+    <string name="notice_failed">Something went wrong</string>
 </resources>

@@ -3,13 +3,13 @@
     <string name="app_name">Cairn</string>
 
     <string name="open_on_phone">Open Cairn on your phone</string>
-    <string name="nothing_to_buy">Nothing to buy</string>
+    <string name="nothing_to_buy">Empty</string>
     <string name="bought">Bought</string>
-    <string name="tick">Tick off</string>
-    <string name="untick">Put back on the list</string>
+    <string name="tick">Mark bought</string>
+    <string name="untick">Mark not bought</string>
 
     <string name="open">Open</string>
-    <string name="tile_description">What is left to buy</string>
+    <string name="tile_description">Shopping list</string>
     <plurals name="to_buy">
         <item quantity="one">%d to buy</item>
         <item quantity="other">%d to buy</item>
