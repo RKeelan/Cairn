@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The window before Compose draws: no action bar, and light or dark as the system is. -->
-    <style name="Theme.Cairn" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- The window before Compose draws: no action bar, and Cairn's ground, light or dark as the system is. -->
+    <style name="Theme.Cairn" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ground</item>
+    </style>
 </resources>

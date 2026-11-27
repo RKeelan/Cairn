@@ -12,6 +12,8 @@ Unit tests must cover at least 75% of the code Kover measures in each module. Le
 
 The list the phone sends the watch, and the ticks the watch sends back, are in `link/src/main/kotlin/.../WatchList.kt`. A watch app and a phone app of different versions may meet, so add fields with defaults, and never rename or remove one.
 
+`docs/appearance.md` specifies the icons and colours. Change it with each app's `ui/Theme.kt` and launcher icon.
+
 ## Speed
 
 Every tap shows its result within 100 ms of the finger lifting, the long-standing limit for a response to feel instantaneous ([Nielsen](https://www.nngroup.com/articles/response-times-3-important-limits/)), at the 90th percentile. Scrolling keeps up with the display's frame rate, drawing each frame in time for its refresh. Both hold on a Pixel 10 Pro XL and a Pixel Watch 4, in a release build. README.md, under "Measure speed", says how to measure them. Measure a change that could slow either.
