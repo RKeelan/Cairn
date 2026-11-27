@@ -25,6 +25,7 @@ plugins {
     alias(libs.plugins.room) apply false
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.play.publisher) apply false
 }
 
 // Robolectric reaches into JDK internals for file descriptors, which JDK 17 and later close to it by default.
@@ -40,6 +41,26 @@ val keystoreProperties =
     ).firstOrNull { it.isFile }?.let { file ->
         Properties().apply { file.inputStream().use(::load) }
     }
+
+// Cairn's version, Major.Minor.Revision, from cairn.version in version.properties (see README.md). The phone app's version code is
+// major * 1,000,000 + minor * 1,000 + revision, so a newer version always has the greater code, as Play requires of each upload. Play also
+// requires each upload's code to differ from every other's, the other app's included, so the watch app's code adds 1,000,000,000.
+val cairnVersion =
+    Properties()
+        .apply { rootProject.file("version.properties").inputStream().use(::load) }
+        .getProperty("cairn.version")
+        ?: error("version.properties has no cairn.version")
+val phoneVersionCode =
+    cairnVersion.split(".").map(String::toIntOrNull).let { parts ->
+        val (major, minor, revision) =
+            parts.filterNotNull().takeIf { it.size == 3 && parts.size == 3 }
+                ?: error("cairn.version must be Major.Minor.Revision, not $cairnVersion")
+        require(major in 0..999 && minor in 0..999 && revision in 0..999) {
+            "cairn.version $cairnVersion is out of range for a version code: each part must be at most 999"
+        }
+        major * 1_000_000 + minor * 1_000 + revision
+    }
+val watchVersionCodeOffset = 1_000_000_000
 
 // Every dependency is pinned to an exact version, so a range or a snapshot fails the build.
 allprojects {
@@ -105,10 +126,13 @@ subprojects {
         }
     }
 
-    // Both apps sign every build, debug and release in both flavours, with Cairn's one key: the Data Layer links only apps signed with
+    // Both apps take their version from version.properties. Both sign every build, debug and release in both flavours, with Cairn's one key: the Data Layer links only apps signed with
     // the same key, and Android installs a build over another only when they share a key, so switching builds never needs an uninstall.
     pluginManager.withPlugin("com.android.application") {
         val android = extensions.getByType<ApplicationExtension>()
+        android.defaultConfig.versionName = cairnVersion
+        android.defaultConfig.versionCode = if (path == ":wear") watchVersionCodeOffset + phoneVersionCode else phoneVersionCode
+
         val key =
             keystoreProperties?.let { properties ->
                 android.signingConfigs.create("cairn") {

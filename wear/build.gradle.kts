@@ -1,11 +1,14 @@
 // The watch app: the list, and a tap to tick an item off or back on. It gets the list from the phone app, through :link, and talks to nothing
 // else.
+import com.github.triplet.gradle.androidpublisher.ReleaseStatus
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.play.publisher)
 }
 
 android {
@@ -18,8 +21,6 @@ android {
         // The phone app has the same application ID, which the Wearable Data Layer requires of the two ends of a link.
         applicationId = "com.rkeelan.cairn"
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
     }
 
     productFlavors {
@@ -31,6 +32,22 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // Only prod is published, as for the phone app.
+    playConfigs {
+        register("dev") {
+            enabled = false
+        }
+    }
+}
+
+// Publishing prod to the internal testing track of Play's Wear OS form factor, which Play keeps apart from the phone app's tracks. Otherwise
+// as for the phone app (see phone/build.gradle.kts).
+play {
+    track = "wear:internal"
+    releaseStatus = ReleaseStatus.COMPLETED
+    defaultToAppBundles = true
+    providers.gradleProperty("cairn.playCredentials").orNull?.let { serviceAccountCredentials.set(rootProject.file(it)) }
 }
 
 // The Baseline Profile that :baselineprofile:wear generates, kept in src/main so that both flavours ship it. Release builds carry it, and Android
