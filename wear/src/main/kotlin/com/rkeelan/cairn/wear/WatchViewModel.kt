@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.rkeelan.cairn.link.Link
+import com.rkeelan.cairn.link.Received
 import com.rkeelan.cairn.link.Tick
 import com.rkeelan.cairn.link.WatchItem
 import com.rkeelan.cairn.link.WatchList
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 /** What the watch shows. */
@@ -55,36 +58,35 @@ sealed interface WatchRow {
 }
 
 /**
- * The state behind the watch's one screen. [lists] is the list as the phone last sent it, with the ticks on their way to it laid over it, and
- * [send] sends a tick. A tick shows at once, without waiting for the Data Layer to report it.
+ * The state behind the watch's one screen. [received] is what the Data Layer holds: the list as the phone last sent it, and the ticks on their way
+ * to it. [send] sends a tick. A tick shows at once, and stays shown until the list from the phone shows it.
  */
-class WatchViewModel(lists: Flow<WatchList?>, private val send: suspend (Tick) -> Unit, private val clock: () -> Long = System::currentTimeMillis) :
+class WatchViewModel(received: Flow<Received>, private val send: suspend (Tick) -> Unit, private val clock: () -> Long = System::currentTimeMillis) :
     ViewModel() {
-    private val sending = MutableStateFlow<List<Tick>>(emptyList())
+    private val waiting = MutableStateFlow(WaitingTicks())
     private val boughtShown = MutableStateFlow(BOUGHT_PAGE)
     private val latest = MutableStateFlow<WatchList?>(null)
 
-    val state: StateFlow<WatchState> = combine(lists, sending, boughtShown) { list, sending, shown ->
+    val state: StateFlow<WatchState> = combine(received, waiting, boughtShown) { received, _, shown ->
+        // Lets go of the ticks the phone's list now shows. It works on the ticks as they are now, rather than as combine last saw them, so that
+        // a tap made in between keeps its tick. Should that change them, this runs once more, and changes nothing.
+        val stillWaiting = waiting.updateAndGet { it.after(received) }
+        val list = received.list?.with(stillWaiting.ticks)
         latest.value = list
         when (list) {
             null -> WatchState.NoList
-
-            else -> {
-                val shownList = list.with(sending)
-                WatchState.Ready(shownList.needed, shownList.bought.take(shown), shownList.bought.size > shown)
-            }
+            else -> WatchState.Ready(list.needed, list.bought.take(shown), list.bought.size > shown)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_AFTER_MILLIS), WatchState.Starting)
 
     /** Marks the item with this [key] bought, or needed again. */
     fun setBought(key: String, bought: Boolean) {
-        val list = latest.value?.with(sending.value) ?: return
-        val tick = list.tick(key, bought, clock()) ?: return
-        sending.value += tick
+        // With the ticks made since the list was last shown, as when two taps come before the next frame.
+        val tick = latest.value?.with(waiting.value.ticks)?.tick(key, bought, clock()) ?: return
+        waiting.value += tick
         viewModelScope.launch {
-            // A tick sent is a data item, which the list the Data Layer reports lays over itself. A tick that could not be sent is undone.
-            runCatching { send(tick) }
-            sending.value -= tick
+            // A tick that could not be sent is undone. One that was sent stays shown until the phone's list shows it.
+            if (runCatching { send(tick) }.isFailure) waiting.update { it.undo(tick) }
         }
     }
 

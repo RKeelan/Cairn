@@ -55,11 +55,8 @@ object Link {
         client(context).putDataItem(PutDataRequest.create(tickPath(tick.key)).setData(tick.encode()).setUrgent()).await()
     }
 
-    /**
-     * On the watch: the list as the phone last sent it, with the ticks still on their way laid over it. It is null until the phone has sent a list,
-     * and after it has said there is none.
-     */
-    fun list(context: Context): Flow<WatchList?> = callbackFlow {
+    /** On the watch: the list as the phone last sent it, and the ticks still on their way, each time either changes. */
+    fun list(context: Context): Flow<Received> = callbackFlow {
         val client = client(context)
         suspend fun read() {
             var list: WatchList? = null
@@ -77,7 +74,7 @@ object Link {
             } finally {
                 items.release()
             }
-            send(list?.with(ticks))
+            send(Received(list, ticks))
         }
         val listener = DataClient.OnDataChangedListener { events ->
             val relevant = events.any { relevant(it) }
