@@ -12,6 +12,8 @@
     <string name="undo">Undo</string>
     <string name="removed">Removed %s</string>
     <string name="more">More</string>
+    <string name="update">Update</string>
+    <string name="update_watch">Update watch</string>
 
     <string name="edit_item">Edit item</string>
     <string name="name">Name</string>

@@ -1,8 +1,10 @@
 package com.rkeelan.cairn.link
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class WatchListTest {
@@ -60,5 +62,17 @@ class WatchListTest {
         assertEquals(list, WatchList.decode(list.encode()))
         assertEquals(tick, Tick.decode(tick.encode()))
         assertEquals(tick, Tick.decode("""{"key":"milk","bought":true,"at":500,"from":"a later version"}""".toByteArray()))
+        val app = WatchApp(1_000_001_000, fromPlay = true)
+        assertEquals(app, WatchApp.decode(app.encode()))
+        assertEquals(app, WatchApp.decode("""{"versionCode":1000001000,"fromPlay":true,"from":"a later version"}""".toByteArray()))
+    }
+
+    @Test
+    fun `a watch app is older than a phone app of a later version, and not of the same or an earlier one`() {
+        val watch = WatchApp(1_000_001_000, fromPlay = true)
+        assertTrue(watch.isOlderThan(1_001))
+        assertTrue(watch.isOlderThan(1_000_000))
+        assertFalse(watch.isOlderThan(1_000))
+        assertFalse(watch.isOlderThan(999))
     }
 }

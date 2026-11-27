@@ -12,6 +12,8 @@ work = "2.12.0"
 credentials = "1.6.0"
 googleId = "1.2.1"
 playServicesWearable = "19.0.0"
+wearRemoteInteractions = "1.2.0"
+playAppUpdate = "2.1.0"
 coroutines = "1.11.0"
 serialization = "1.13.0"
 supabase = "3.9.0"
@@ -45,6 +47,8 @@ androidx-credentials = { module = "androidx.credentials:credentials", version.re
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
 play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "playServicesWearable" }
+androidx-wear-remote-interactions = { module = "androidx.wear:wear-remote-interactions", version.ref = "wearRemoteInteractions" }
+play-app-update = { module = "com.google.android.play:app-update", version.ref = "playAppUpdate" }
 androidx-wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "wearCompose" }
 androidx-wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wearCompose" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
