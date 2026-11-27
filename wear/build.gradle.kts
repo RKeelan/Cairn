@@ -3,6 +3,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.baselineprofile)
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
 }
@@ -32,9 +33,25 @@ android {
     }
 }
 
+// The Baseline Profile that :baselineprofile:wear generates, kept in src/main so that both flavours ship it. Release builds carry it, and Android
+// compiles the code it lists ahead of time.
+baselineProfile {
+    mergeIntoMain = true
+    // Generating needs a device, so a build never does it on its own.
+    automaticGenerationDuringBuild = false
+    // The flavours share their code, so the dev flavour, which signs in to the local Supabase stack, generates the profile for both.
+    variants {
+        create("devRelease") {
+            from(project(":baselineprofile:wear"))
+        }
+    }
+}
+
 dependencies {
     implementation(project(":link"))
     implementation(libs.kotlinx.coroutines.android)
+    // Installs the profile on first launch when the app is installed without Play or a Gradle install to do it.
+    implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

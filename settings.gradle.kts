@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Cairn"
-include(":core", ":link", ":phone", ":wear")
+include(":core", ":link", ":phone", ":wear", ":baselineprofile:phone", ":baselineprofile:wear")

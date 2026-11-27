@@ -15,6 +15,8 @@ plugins {
     base
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.baselineprofile) apply false
     // AGP compiles Android modules' Kotlin itself; declaring the Kotlin plugin here also pins the Kotlin version AGP uses.
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.compose) apply false
@@ -123,7 +125,7 @@ subprojects {
         }
     }
 
-    listOf("com.android.application", "com.android.library").forEach { android ->
+    listOf("com.android.application", "com.android.library", "com.android.test").forEach { android ->
         pluginManager.withPlugin(android) {
             extensions.configure<CommonExtension> {
                 defaultConfig.minSdk = 34
