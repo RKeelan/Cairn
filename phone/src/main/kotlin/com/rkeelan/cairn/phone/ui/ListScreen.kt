@@ -124,7 +124,15 @@ fun ListScreen(
     Scaffold(
         topBar = {
             Column {
-                TopAppBar(title = { Text(stringResource(R.string.list_title)) }, actions = { Menu(onMembers, onSettings) })
+                val updates = LocalUpdates.current
+                TopAppBar(
+                    title = { Text(stringResource(R.string.list_title)) },
+                    actions = {
+                        updates.phone?.let { TextButton(onClick = it) { Text(stringResource(R.string.update)) } }
+                        updates.watch?.let { TextButton(onClick = it) { Text(stringResource(R.string.update_watch)) } }
+                        Menu(onMembers, onSettings)
+                    },
+                )
                 SyncNote(state.problem, state.list.unsent.size)
             }
         },

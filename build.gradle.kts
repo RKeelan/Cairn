@@ -60,6 +60,7 @@ val phoneVersionCode =
         }
         major * 1_000_000 + minor * 1_000 + revision
     }
+// WATCH_VERSION_CODE_OFFSET in :link, by which the phone app tells whether the watch app is older, must match.
 val watchVersionCodeOffset = 1_000_000_000
 
 // Every dependency is pinned to an exact version, so a range or a snapshot fails the build.

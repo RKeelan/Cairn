@@ -115,6 +115,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.id)
     implementation(libs.play.services.wearable)
+    implementation(libs.play.app.update)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)

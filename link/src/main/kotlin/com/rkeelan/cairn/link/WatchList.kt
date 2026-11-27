@@ -55,5 +55,27 @@ data class Tick(val key: String, val bought: Boolean, val at: Long) {
     }
 }
 
+/**
+ * What the watch tells the phone about the watch app installed on it: its [versionCode], and whether Google Play installed it, [fromPlay]. The
+ * phone offers to update a watch app that Play installed and that is older than the phone app.
+ */
+@Serializable
+data class WatchApp(val versionCode: Long = 0, val fromPlay: Boolean = false) {
+    /**
+     * Whether this watch app is an older version of Cairn than the phone app whose version code is [phoneVersionCode]. Each version is published
+     * to both, with the watch app's code [WATCH_VERSION_CODE_OFFSET] above the phone app's, so Play then has a newer watch app too.
+     */
+    fun isOlderThan(phoneVersionCode: Long): Boolean = versionCode - WATCH_VERSION_CODE_OFFSET < phoneVersionCode
+
+    fun encode(): ByteArray = json.encodeToString(this).toByteArray()
+
+    companion object {
+        fun decode(bytes: ByteArray): WatchApp = json.decodeFromString(bytes.decodeToString())
+    }
+}
+
+/** How far the watch app's version code is above the phone app's for the same version of Cairn, as the root build.gradle.kts sets it. */
+const val WATCH_VERSION_CODE_OFFSET = 1_000_000_000L
+
 // A watch app older or newer than the phone app skips fields it doesn't know.
 private val json = Json { ignoreUnknownKeys = true }

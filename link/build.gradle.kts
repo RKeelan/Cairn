@@ -20,6 +20,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.play.services.wearable)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.wear.remote.interactions)
 
     testImplementation(libs.junit)
 }
