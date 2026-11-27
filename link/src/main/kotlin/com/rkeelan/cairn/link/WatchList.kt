@@ -45,6 +45,15 @@ data class WatchList(val items: List<WatchItem>) {
     }
 }
 
+/**
+ * What the Data Layer holds on the watch: the [list] as the phone last sent it, which is null until the phone has sent one and after it has said
+ * there is none, and the [ticks] on their way to the phone, whose data items the phone has yet to delete.
+ */
+data class Received(val list: WatchList?, val ticks: List<Tick> = emptyList()) {
+    /** The list with the ticks laid over it. */
+    val shown: WatchList? get() = list?.with(ticks)
+}
+
 /** A tick made on the watch: the item with [key] marked bought, or needed again, at [at] in milliseconds since the epoch. */
 @Serializable
 data class Tick(val key: String, val bought: Boolean, val at: Long) {

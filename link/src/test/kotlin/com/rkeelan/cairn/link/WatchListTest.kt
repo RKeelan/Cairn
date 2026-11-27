@@ -56,6 +56,14 @@ class WatchListTest {
     }
 
     @Test
+    fun whatTheDataLayerHoldsIsShownWithItsTicksLaidOverTheList() {
+        val tick = Tick("milk", bought = true, at = 500)
+
+        assertEquals(list.with(listOf(tick)), Received(list, listOf(tick)).shown)
+        assertNull(Received(null, listOf(tick)).shown)
+    }
+
+    @Test
     fun listsAndTicksSurviveTheTrip() {
         val tick = Tick("milk", bought = true, at = 500)
 

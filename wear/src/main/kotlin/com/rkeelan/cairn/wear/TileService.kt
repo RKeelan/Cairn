@@ -26,7 +26,7 @@ class TileService : Material3TileService(allowDynamicTheme = false, defaultColor
     }
 
     private suspend fun readList(): WatchList? = try {
-        withTimeoutOrNull(READ_TIMEOUT_MILLIS) { Link.list(this@TileService).first() }
+        withTimeoutOrNull(READ_TIMEOUT_MILLIS) { Link.list(this@TileService).first().shown }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
