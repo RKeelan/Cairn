@@ -1,7 +1,6 @@
 package com.rkeelan.cairn.phone.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +15,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,14 +36,13 @@ import com.rkeelan.cairn.phone.SignInOptions
 import com.rkeelan.cairn.phone.UiState
 import com.rkeelan.cairn.phone.googleToken
 
-/** The phone app: whichever screen the state calls for, in the system's colours. */
+/** The phone app: whichever screen the state calls for, in Cairn's colours. */
 @Composable
 fun PhoneApp(model: CairnViewModel, signIn: SignInOptions) {
     val state by model.state.collectAsStateWithLifecycle()
     val notice by model.notice.collectAsStateWithLifecycle()
     val activity = LocalContext.current
-    val colours = if (isSystemInDarkTheme()) dynamicDarkColorScheme(activity) else dynamicLightColorScheme(activity)
-    MaterialTheme(colorScheme = colours) {
+    CairnTheme {
         val snackbars = remember { SnackbarHostState() }
         Notices(notice, snackbars, onSaid = model::dismissNotice)
         when (val current = state) {

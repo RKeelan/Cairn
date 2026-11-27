@@ -49,7 +49,7 @@ import com.rkeelan.cairn.wear.curveOffset
 @Composable
 fun WatchApp(model: WatchViewModel, interactions: Interactions) {
     val state by model.state.collectAsStateWithLifecycle()
-    MaterialTheme {
+    CairnTheme {
         AppScaffold {
             when (val current = state) {
                 WatchState.Starting -> Unit

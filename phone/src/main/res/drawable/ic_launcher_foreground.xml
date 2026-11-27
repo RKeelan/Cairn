@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Three stacked stones, within the middle two thirds of the canvas, which is all of an adaptive icon that is sure to show. -->
+<!-- Four flat slate stones stacked by hand, each a little askew, drawn in a 48-unit box and scaled to fit, with their corners, inside the 66 dp circle of an adaptive icon that every mask shows. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <group
-        android:scaleX="1.5"
-        android:scaleY="1.5"
-        android:translateX="18"
-        android:translateY="15">
+        android:scaleX="1.6"
+        android:scaleY="1.6"
+        android:translateX="15.6"
+        android:translateY="11.6">
         <path
-            android:fillColor="#FFB0BEC5"
-            android:pathData="M12,34a12,5 0,1 0,24 0a12,5 0,1 0,-24 0z" />
+            android:fillColor="#FF566870"
+            android:pathData="M9.5,37.5C9.5,33 16,31 24,31C33,31 38.5,33.2 38.5,36.8C38.5,40 32,41.2 23.5,41.2C15,41.2 9.5,40.2 9.5,37.5Z" />
+        <group
+            android:pivotX="24"
+            android:pivotY="27.5"
+            android:rotation="-5">
+            <path
+                android:fillColor="#FF7F929A"
+                android:pathData="M13.5,28.2C13.5,25 18.5,23.6 24.5,23.6C30.5,23.6 34.2,25.2 34.2,27.8C34.2,30.4 30.2,31.4 24,31.4C17.8,31.4 13.5,30.8 13.5,28.2Z" />
+        </group>
+        <group
+            android:pivotX="24"
+            android:pivotY="20.5"
+            android:rotation="6">
+            <path
+                android:fillColor="#FFA8B8BE"
+                android:pathData="M16.8,21C16.8,18.4 20,17.2 24,17.2C28.2,17.2 30.8,18.6 30.8,20.8C30.8,23 27.6,23.9 23.6,23.9C19.6,23.9 16.8,23.2 16.8,21Z" />
+        </group>
         <path
-            android:fillColor="#FFCFD8DC"
-            android:pathData="M15,25a9,4 0,1 0,18 0a9,4 0,1 0,-18 0z" />
-        <path
-            android:fillColor="#FFECEFF1"
-            android:pathData="M18,17.5a6,3 0,1 0,12 0a6,3 0,1 0,-12 0z" />
+            android:fillColor="#FFD2DDE0"
+            android:pathData="M19.5,14.6a3.7,2.7 0,1 0,7.4 0a3.7,2.7 0,1 0,-7.4 0z" />
     </group>
 </vector>

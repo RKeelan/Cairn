@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FF263238</color>
+    <!-- The launcher icon's sea green, behind the slate stones. -->
+    <color name="ic_launcher_background">#FF0E4643</color>
+    <!-- The ground, behind the window until the first frame and in the splash screen. values-night sets the dark ground. -->
+    <color name="ground">#FFEEF3F2</color>
 </resources>
