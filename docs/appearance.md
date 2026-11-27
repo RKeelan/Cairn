@@ -22,4 +22,6 @@ The phone's colours are a pair of Material 3 `ColorScheme`s in `phone/.../ui/The
 * `errorContainer`: the ground behind a row swiped away to delete it. Material's default red, light and dark.
 * Nothing is tinted by its elevation: `surfaceTint` is the ground.
 
-The watch is always dark, on a black ground, so its `ColorScheme`, in `wear/.../ui/Theme.kt`, takes the phone's dark values for the roles they share.
+The watch is always dark, on a black ground, so its `ColorScheme`, in `wear/.../ui/Theme.kt`, takes the phone's dark values for the roles they share. Its tile, in `wear/.../ui/Tile.kt`, takes the same colours rather than the system's.
+
+The tile picker shows `wear/src/main/res/drawable-nodpi/tile_preview.png`, a screenshot of the tile showing a made-up list. Take it again when the tile's look changes.

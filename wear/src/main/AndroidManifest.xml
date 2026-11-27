@@ -23,5 +23,41 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Cairn's tile, which shows what is left to buy and opens the app. -->
+        <service
+            android:name=".TileService"
+            android:description="@string/tile_description"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+            </intent-filter>
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+        </service>
+
+        <!-- Redraws the tile when the list changes, whether or not the app is open. -->
+        <service
+            android:name=".ListService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:path="/list"
+                    android:scheme="wear" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/ticks/"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>
