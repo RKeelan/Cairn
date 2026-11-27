@@ -1,5 +1,7 @@
 // The phone app: the list, with adding, editing and amounts, the people it is shared with, and the list it sends to the watch. It alone talks to
 // the Supabase project.
+import com.github.triplet.gradle.androidpublisher.ReleaseStatus
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -8,6 +10,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.play.publisher)
 }
 
 // The hosted Supabase project and the Google sign-in client, from Gradle properties kept outside the repository (see README.md).
@@ -29,8 +32,6 @@ android {
         // The watch app has the same application ID, which the Wearable Data Layer requires of the two ends of a link.
         applicationId = "com.rkeelan.cairn"
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
     }
 
     buildFeatures {
@@ -60,6 +61,24 @@ android {
             buildConfigField("String", "DEV_PASSWORD", javaString("cairn-dev-password"))
         }
     }
+
+    // Only prod is published. dev has its own application ID, which Play does not know, and it is the flavour measured.
+    playConfigs {
+        register("dev") {
+            enabled = false
+        }
+    }
+}
+
+// Publishing prod to Google Play's internal testing track, which scripts/publish.ps1 runs (see README.md). Each release rolls out to the
+// track's testers at once. The service account's JSON key is the file named by `-Pcairn.playCredentials=<path>`, relative to the repository's
+// root, or else the contents of the ANDROID_PUBLISHER_CREDENTIALS environment variable. Only the publish tasks read it, so building and
+// checking need neither.
+play {
+    track = "internal"
+    releaseStatus = ReleaseStatus.COMPLETED
+    defaultToAppBundles = true
+    providers.gradleProperty("cairn.playCredentials").orNull?.let { serviceAccountCredentials.set(rootProject.file(it)) }
 }
 
 // Room writes each schema version here, to be committed: a migration is written and tested against the exported schemas.
