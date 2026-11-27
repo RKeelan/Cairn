@@ -25,7 +25,7 @@ The apps never write to a table. They call four functions, which `supabase/migra
 * `:core` is pure Kotlin on the JVM and never depends on Android. It holds the list and its operations, the exchange of changes with the server, and the Supabase client.
 * `:link` is an Android library that both apps use: the list as the watch shows it, the ticks the watch sends back, the Data Layer that carries both, and the timer that times taps.
 * `:phone` is the phone app, written with Compose and Material 3. Its `ui` package holds the screens, and the rest holds storage, sync, sign-in and the view model.
-* `:wear` is the Wear OS app, written with Compose for Wear OS: one screen, a list whose rows follow the round edge of the screen, where a tap ticks an item off or puts it back. Its `ui` package holds the screen, and the rest the state behind it.
+* `:wear` is the Wear OS app, written with Compose for Wear OS: one screen, a list whose rows follow the round edge of the screen, where a tap ticks an item off or puts it back. It also has a tile, which shows the items still to buy and opens the app. Its `ui` package holds the screen and the tile's layout, and the rest the state behind them.
 * `:baselineprofile:phone` and `:baselineprofile:wear` generate each app's Baseline Profile on a device (see "Baseline Profiles"). Neither ships in an app.
 * `supabase/` is the Supabase project: its configuration, its migrations, and the seed data of the local stack.
 
