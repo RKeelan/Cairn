@@ -26,6 +26,7 @@ The apps never write to a table. They call four functions, which `supabase/migra
 * `:link` is an Android library that both apps use: the list as the watch shows it, the ticks the watch sends back, the Data Layer that carries both, and the timer that times taps.
 * `:phone` is the phone app, written with Compose and Material 3. Its `ui` package holds the screens, and the rest holds storage, sync, sign-in and the view model.
 * `:wear` is the Wear OS app, written with Compose for Wear OS: one screen, a list whose rows follow the round edge of the screen, where a tap ticks an item off or puts it back. Its `ui` package holds the screen, and the rest the state behind it.
+* `:baselineprofile:phone` and `:baselineprofile:wear` generate each app's Baseline Profile on a device (see "Baseline Profiles"). Neither ships in an app.
 * `supabase/` is the Supabase project: its configuration, its migrations, and the seed data of the local stack.
 
 Each app has two flavours. `prod` is the app in daily use, against a hosted Supabase project. `dev`, `com.rkeelan.cairn.dev`, installs alongside it and uses a Supabase stack running on the PC. The phone app and the watch app share an application ID, which the Data Layer requires.
@@ -73,6 +74,13 @@ Android refuses to install a build over one signed with a different key, so a de
 
 A tap should show its result within 100 ms, and scrolling should keep up with the display's frame rate, on a Pixel 10 Pro XL and a Pixel Watch 4 (AGENTS.md, "Speed"). A debug build runs slower than a release build, so measure a release build against those figures. The commands below measure the dev flavour on the device `ANDROID_SERIAL` names; the phone app and the watch app share its package name, `com.rkeelan.cairn.dev`.
 
+Measure only compiled code. Each app ships a Baseline Profile (see "Baseline Profiles" below), and `installDevRelease` installs it beside the APK, so Android compiles the code it lists at install. An APK installed with `adb install` runs on the JIT until the device's background compilation gets to it, which makes it slower: the watch's scrolling once measured 8% janky uncompiled and under 1% compiled. To compile such an install at once:
+
+```sh
+adb shell cmd package compile -m speed-profile -f com.rkeelan.cairn.dev
+adb shell dumpsys package dexopt | grep -A2 com.rkeelan.cairn.dev   # Shows status=speed-profile once compiled
+```
+
 ### Taps
 
 Each app times a tap from the finger lifting to the commit of the frame that shows its result, and logs it under the tag `Cairn`:
@@ -99,7 +107,25 @@ adb shell dumpsys gfxinfo com.rkeelan.cairn.dev reset
 adb shell dumpsys gfxinfo com.rkeelan.cairn.dev
 ```
 
-The report gives the number of frames rendered, the janky frames among them, which missed the display's refresh, and the 50th, 90th, 95th and 99th percentile times to draw a frame. Scrolling keeps up when there are no janky frames, and the percentiles stay under the display's refresh interval: 8.3 ms at 120 Hz, 16.7 ms at 60 Hz. Reset the counts before each measurement, since they cover everything drawn since the last reset, and leave the screen still apart from the scroll, since a tap or an animation adds its own frames.
+The report gives the number of frames rendered, the janky frames among them, which missed the display's refresh, and the 50th, 90th, 95th and 99th percentile times to draw a frame. Scrolling keeps up when there are no janky frames, and the percentiles stay under the display's refresh interval: 8.3 ms at 120 Hz, 16.7 ms at 60 Hz. Reset the counts before each measurement, since they cover everything drawn since the last reset, and leave the screen still apart from the scroll, since a tap or an animation adds its own frames. After starting the app, wait a few seconds before the reset, so that the frames drawn while it starts are left out.
+
+## Baseline Profiles
+
+A Baseline Profile lists the classes and methods an app runs as it starts and in its common paths, so that Android compiles them ahead of time rather than leaving them to the JIT. Each app's profile is in its `src/main/generated/baselineProfiles`, and release builds of both flavours carry it. `:baselineprofile:phone` and `:baselineprofile:wear` generate them, by running each app's dev flavour on a device: starting it, scrolling the list, and ticking an item off and back on.
+
+Generate them again after a change to what the apps run, such as a new screen or an upgrade of Compose. Each needs a device running Android 13 or later, and an app with a list of more items than fill the screen:
+
+* For the phone app, start the local Supabase stack and forward its port, install the build the generator uses with `./gradlew :phone:installDevNonMinifiedRelease`, and sign in.
+* For the watch app, pair the watch with that phone, so that it holds the list.
+
+Then, with `ANDROID_SERIAL` naming the phone or the watch:
+
+```sh
+./gradlew :phone:generateBaselineProfile -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true
+./gradlew :wear:generateBaselineProfile -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true
+```
+
+Without the property, the run uninstalls the app when it ends, which signs the phone app out and deletes its copy of the list.
 
 ## The local Supabase stack
 
