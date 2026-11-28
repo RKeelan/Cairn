@@ -105,7 +105,7 @@ class CairnViewModelTest {
     fun signingInShowsTheAccountsList() = test {
         device(ADA).run {
             add("Milk")
-            add("Eggs", amount = "a dozen")
+            add("Eggs", amount = Amount(unit = "dozen"))
         }
 
         val tablet = device()
