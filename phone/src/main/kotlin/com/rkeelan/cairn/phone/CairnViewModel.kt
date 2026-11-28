@@ -85,8 +85,8 @@ class CairnViewModel(private val repository: ListRepository, private val server:
         said.value = null
     }
 
-    /** Adds [name], with the amount [amount] describes, such as "2 loaves" (see [Amount.parse]). */
-    fun add(name: String, amount: String = "") = edit { add(name, it, Amount.parse(amount)) }
+    /** Adds [name], with [amount] if it is not none. */
+    fun add(name: String, amount: Amount = Amount.NONE) = edit { add(name, it, amount) }
 
     fun setTicked(key: String, ticked: Boolean) = edit { if (ticked) tick(key, it) else untick(key, it) }
 

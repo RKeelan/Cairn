@@ -44,12 +44,38 @@ data class Amount(val quantity: Double? = null, val unit: String? = null) {
             return Amount(quantity, words?.let(::unitOf))
         }
 
+        /**
+         * The name and the amount in [text] typed as an item, as in "bread 2 loaves". The amount is the last one, two or three words, the longest
+         * that are a number and then perhaps a unit, such as "2 loaves", "2 1/2 cups" or "500g". The number is whole, a decimal, a fraction, or a
+         * whole number and a fraction, and must be above zero and below [MAX_QUANTITY]. The unit is one word that starts with a letter, after a
+         * space or joined to the number. A number is required, so "a box" is part of the name, and at least one word must be left for the name.
+         * Text with no such amount is all name.
+         */
+        fun split(text: String): Pair<String, Amount> {
+            val words = tidy(text).split(" ")
+            for (size in MAX_AMOUNT_WORDS downTo 1) {
+                if (words.size <= size) continue
+                val candidate = words.takeLast(size).joinToString(" ")
+                if (!trailing.matches(candidate)) continue
+                val amount = parse(candidate)
+                if (amount.quantity != null) return words.dropLast(size).joinToString(" ") to amount
+            }
+            return words.joinToString(" ") to NONE
+        }
+
         /** The standard form of [typed] if it is a unit the list recognises, and otherwise [typed] itself. */
         fun unitOf(typed: String): String = units[typed.lowercase(Locale.ROOT)] ?: typed
 
         private val pattern = Regex(
             """(?:(?<number>\d+ \d+/\d+|\d+/\d+|\d+(?:[.,]\d+)?|[.,]\d+) ?|(?i:an?) )?(?<unit>\S.*)?""",
         )
+
+        // The most words an amount after a name may take, as in "2 1/2 cups".
+        private const val MAX_AMOUNT_WORDS = 3
+
+        // An amount that may follow a name: a number, which may be a whole number and a fraction, and then perhaps a unit, which starts with a
+        // letter and may be joined to the number.
+        private val trailing = Regex("""(?:\d+ \d+/\d+|\d+/\d+|\d+(?:[.,]\d+)?|[.,]\d+)(?: ?\p{L}\S*)?""")
 
         private fun number(text: String): Double? {
             val parts = text.split(" ")

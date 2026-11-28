@@ -64,6 +64,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.rkeelan.cairn.core.Amount
 import com.rkeelan.cairn.core.Item
 import com.rkeelan.cairn.core.MAX_NAME_LENGTH
 import com.rkeelan.cairn.core.Problem
@@ -87,7 +88,7 @@ private const val MAX_AMOUNT_LENGTH = 30
 fun ListScreen(
     state: UiState.Ready,
     snackbars: SnackbarHostState,
-    onAdd: (String) -> Unit,
+    onAdd: (name: String, amount: Amount) -> Unit,
     onTick: (key: String, ticked: Boolean) -> Unit,
     onRemove: (key: String) -> Unit,
     onRestore: (List<Item>) -> Unit,
@@ -139,8 +140,8 @@ fun ListScreen(
         bottomBar = {
             AddBar(
                 list = state.list,
-                onAdd = { name ->
-                    onAdd(name)
+                onAdd = { name, amount ->
+                    onAdd(name, amount)
                     added = keyOf(name)
                 },
             )
@@ -294,17 +295,19 @@ private fun BoughtHeading(modifier: Modifier = Modifier) {
 }
 
 /**
- * Where an item is typed and added. While something is typed, the bar offers the items bought before that match it. The keyboard stays up after
- * an item is added, ready for the next.
+ * Where an item is typed and added, perhaps with an amount after its name, as in "bread 2 loaves" (see [Amount.split]). While something is typed,
+ * the bar offers the items bought before that match its name, each to be added with the typed amount. The keyboard stays up after an item is
+ * added, ready for the next.
  */
 @Composable
-private fun AddBar(list: ShoppingList, onAdd: (String) -> Unit) {
+private fun AddBar(list: ShoppingList, onAdd: (name: String, amount: Amount) -> Unit) {
     var typed by rememberSaveable { mutableStateOf("") }
-    val suggestions = remember(list, typed) { list.suggestions(typed) }
+    val (typedName, typedAmount) = remember(typed) { Amount.split(typed) }
+    val suggestions = remember(list, typedName) { list.suggestions(typedName) }
     val interactions = LocalInteractions.current
     val add = { name: String ->
         if (name.isNotBlank()) {
-            onAdd(name)
+            onAdd(name, typedAmount)
             typed = ""
         }
     }
@@ -332,11 +335,11 @@ private fun AddBar(list: ShoppingList, onAdd: (String) -> Unit) {
                     placeholder = { Text(stringResource(R.string.add_item)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { add(typed) }),
+                    keyboardActions = KeyboardActions(onDone = { add(typedName) }),
                 )
                 FilledIconButton(onClick = {
                     interactions.start("add")
-                    add(typed)
+                    add(typedName)
                 }, enabled = typed.isNotBlank()) {
                     Icon(painterResource(R.drawable.ic_add), contentDescription = stringResource(R.string.add))
                 }
