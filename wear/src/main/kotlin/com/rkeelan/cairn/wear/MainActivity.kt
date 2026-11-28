@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rkeelan.cairn.link.InteractionTimer
 import com.rkeelan.cairn.link.Link
@@ -31,6 +33,18 @@ class MainActivity : ComponentActivity() {
                 throw e
             } catch (e: Exception) {
                 Log.w(TAG, "Could not tell the phone the watch app's version", e)
+            }
+        }
+        // The phone follows the server only while its own app is open, so each time this app comes to the front, it asks the phone to catch up.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                try {
+                    Link.askForSync(this@MainActivity)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not ask the phone to sync", e)
+                }
             }
         }
         setContent { WatchApp(viewModel(factory = WatchViewModel.Factory), interactions) }

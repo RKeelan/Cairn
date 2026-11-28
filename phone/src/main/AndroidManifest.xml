@@ -34,5 +34,18 @@
                     android:scheme="wear" />
             </intent-filter>
         </service>
+
+        <!-- Syncs when the watch asks, whether or not the app is open. -->
+        <service
+            android:name=".SyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:path="/sync"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

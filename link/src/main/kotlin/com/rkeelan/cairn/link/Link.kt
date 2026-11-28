@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException
  * The link between the phone app and the watch app, over the Wearable Data Layer. The phone publishes the list as one data item, which the watch
  * reads; the watch publishes each tick as a data item of its own, which the phone takes and then deletes. Data items wait while the two are apart,
  * so a tick made out of the phone's range reaches it later. The watch also publishes which watch app it has, so that the phone can offer to update
- * an old one.
+ * an old one, and, when its app opens, sends the phone a message asking it to sync, so that the list it shows catches up with the server.
  */
 object Link {
     /** The path of the data item that holds the list. */
@@ -84,6 +84,20 @@ object Link {
         client.addListener(listener).await()
         read()
         awaitClose { client.removeListener(listener) }
+    }
+
+    /** The path of the message in which the watch asks the phone to sync. */
+    const val SYNC = "/sync"
+
+    /**
+     * On the watch: asks the phone to sync, which sends the watch the list again if it has changed. The message goes to every connected device,
+     * and is lost if none is connected; a device without the phone app ignores it.
+     */
+    suspend fun askForSync(context: Context) {
+        val messages = Wearable.getMessageClient(context)
+        for (node in Wearable.getNodeClient(context).connectedNodes.await()) {
+            messages.sendMessage(node.id, SYNC, null).await()
+        }
     }
 
     /** The path of the data item in which the watch says which watch app it has. */
